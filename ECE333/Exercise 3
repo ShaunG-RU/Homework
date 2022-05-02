@@ -156,6 +156,10 @@ printResult:                             #print the 2*2 matrix
 	 mv a1,t1
 	 li a0,1
 	 ecall
+	 
+	 la a1,str3						#new line
+	 li a0,4
+	 ecall
 
 	 li a1,0
     	 li a0,17
