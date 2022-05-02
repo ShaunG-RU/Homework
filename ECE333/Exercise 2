@@ -1,8 +1,15 @@
 .data
-promptN: .asciiz "What is the size of the array?: "
+
 n: .word 7
-promptArr: .asciiz "\nEnter array with each elements seperated by a semi-colon: "
 arr: .word 4,37,0,12,1,0,6
+
+promptN: .asciiz "What is the size of the array?: "
+promptArr: .asciiz "\nEnter array with each elements seperated by a semi-colon: "
+newLine: .asciiz "\n"
+space: .asciiz " "
+oddStr: .asciiz "Odd: "
+evenStr: .asciiz "Even: "
+zeroStr: .asciiz "Zero: "
 answerOddArr: .word
 answerEvenArr: .word
 answerZerosArr: .word
@@ -16,12 +23,13 @@ main:
 #loads .data values into register s0 and s1
 la s0, arr
 lw s1, n
+add t3, s1, zero
 addi s2, zero, 0	#s2=i
 addi s3, zero, 2	#s3=2 value used for modulo calculation
 
 loop:
 
-bge s2, s1, end		#if(i>=n) jump to end
+bge s2, s1, preODD		#if(i>=n) jump to end
 slli t0, s2, 2		#t0=i*4
 add t0, t0, s0		#address of array[i]
 lw t1, 0(t0)		#t1=array[i]
@@ -30,38 +38,92 @@ beq t1, zero, zeros	#if(array[i]==0) jump to zeros
 rem	t2, t1, s3		#t2=array[i]%2
 beq t2, zero, even	#if(array[i]%2==0) jump to even
 #odd
-addi sp, sp, -12
 sw t1, 0(sp)		#store value of t1 to subarray
-addi sp, sp, 12		
+addi sp, sp, -12
 addi s2, s2, 1
 j loop
 even:
+sw t1, 4(sp)		#store value of t1 to subarray
 addi sp, sp, -12
-sw t1, 4(s5)		#store value of t1 to subarray
-addi sp, sp, 12		
 addi s2, s2, 1
 j loop
 zeros:
+sw t1, 8(sp)		#store value of t1 to subarray
 addi sp, sp, -12
-sw t1, 8(s6)		#store value of t1 to subarray
-addi sp, sp, 12		
 addi s2, s2, 1
 j loop
+
+preODD:
+
+la a1,oddStr					
+li a0,4
+ecall
+
+printODD:
+blt t3, zero, preEVEN
+lw a1, 0(sp)		#load num
+beq a1, zero, next1	#if num==0 j next
+addi t6, t6, 1
+li a0, 1			#if not, print num
+ecall
+la a1,space						#space
+li a0,4
+ecall
+next1:
+addi sp, sp, 12
+addi t3, t3, -1
+j printODD
+
+preEVEN:
+
+la a1,newLine						#new line
+li a0,4
+ecall
+
+la a1,evenStr						
+li a0,4
+ecall
+
+add t3, zero s1
+li t4, 12
+mul t5, t4, s1
+sub sp, sp, t5
+
+printEVEN:
+blt t3, zero, preZERO
+lw a1, 4(sp)		#load num
+beq a1, zero, next2	#if num==0 j next
+addi t6, t6, 1
+li a0, 1			#if not, print num
+ecall
+la a1,space						#space
+li a0,4
+ecall
+next2:
+addi sp, sp, 12
+addi t3, t3, -1
+j printEVEN
+
+preZERO:
+
+la a1,newLine						#new line
+li a0,4
+ecall
+
+la a1,zeroStr						
+li a0,4
+ecall
+
+printZERO:
+bge t6, s1, end
+li a1, 0
+li a0, 1
+ecall
+la a1,space						#space
+li a0,4
+ecall
+addi t6, t6, 1
+j printZERO
+
 end:
-
-addi a0, zero, 1
-addi sp, sp, -84
-lw a1, 0(sp)
-ecall
-lw a1, 4(sp)
-ecall
-lw a1, 8(sp)
-ecall
-lw a1, 12(sp)
-ecall
-lw a1, 16(sp)
-ecall
-lw a1, 20(sp)
-ecall
-
 add a0, zero, zero
