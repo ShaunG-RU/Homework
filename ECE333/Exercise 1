@@ -1,0 +1,86 @@
+.data
+prompt: .asciiz "Number is : "
+number: .word   5
+result: .asciiz "\nResult from recursion = "
+result1: .asciiz "\nResult from without recursion= "
+
+.text
+.globl main
+main:
+
+# asking user for input
+#printing a string on console   
+addi a0,x0,4
+la a1,prompt  
+ecall           
+lw a1,number   
+addi a0,x0,1
+ecall
+                   
+#calling a function 
+jal fact_without_rec
+                
+# storing return value in t1
+addi t1,a0,0
+                
+#printing a string
+addi a0,x0,4
+la a1,result1
+ecall
+                
+#printing an integer result
+addi a1,t1,0
+addi a0,x0,1
+ecall   
+lw a1,number
+        
+#calling a function 
+jal fact_with_rec
+                
+# storing return value in t2
+addi t2,a0,0
+                
+#printing a string
+addi a0,x0,4
+la a1,result
+ecall
+                
+#printing an integer result
+addi a1,t2,0
+addi a0,x0,1
+ecall
+                
+#exit code
+addi a0,x0,10
+ecall
+
+#function with recursion  
+fact_with_rec:
+addi a0,x0,1
+addi t0,x0,1		# storing 1 in t0
+beq a1,t0,done		# if a1 ==1 then brnach to done
+addi sp,sp,-8		# storing return address and a1 value
+sw a1,0(sp)
+sw ra,4(sp)
+addi a1,a1,-1		# decrementing an a2
+jal fact_with_rec   # recursion
+lw ra,4(sp)         #loading return address
+lw t1,0(sp)         # loadding a value from stack
+addi sp,sp,8        #adjusting stack
+mul a0,a0,t1        # multipying
+jr ra               # jump to calling
+done:
+addi a2,x0,1
+jr ra
+        
+#function without recursion
+fact_without_rec:
+add a2,x0,a1        #copies in a2
+addi a0,x0,1
+loop: 
+beq a2,x0,donefact  # if a2==0 then donefact
+mul a0,a0,a2
+addi a2,a2,-1
+j loop
+donefact:
+jr ra
