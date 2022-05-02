@@ -1,0 +1,67 @@
+.data
+promptN: .asciiz "What is the size of the array?: "
+n: .word 7
+promptArr: .asciiz "\nEnter array with each elements seperated by a semi-colon: "
+arr: .word 4,37,0,12,1,0,6
+answerOddArr: .word
+answerEvenArr: .word
+answerZerosArr: .word
+
+.text
+.globl main
+
+main:
+
+#initialization code
+#loads .data values into register s0 and s1
+la s0, arr
+lw s1, n
+addi s2, zero, 0	#s2=i
+addi s3, zero, 2	#s3=2 value used for modulo calculation
+
+loop:
+
+bge s2, s1, end		#if(i>=n) jump to end
+slli t0, s2, 2		#t0=i*4
+add t0, t0, s0		#address of array[i]
+lw t1, 0(t0)		#t1=array[i]
+
+beq t1, zero, zeros	#if(array[i]==0) jump to zeros
+rem	t2, t1, s3		#t2=array[i]%2
+beq t2, zero, even	#if(array[i]%2==0) jump to even
+#odd
+addi sp, sp, -12
+sw t1, 0(sp)		#store value of t1 to subarray
+addi sp, sp, 12		
+addi s2, s2, 1
+j loop
+even:
+addi sp, sp, -12
+sw t1, 4(s5)		#store value of t1 to subarray
+addi sp, sp, 12		
+addi s2, s2, 1
+j loop
+zeros:
+addi sp, sp, -12
+sw t1, 8(s6)		#store value of t1 to subarray
+addi sp, sp, 12		
+addi s2, s2, 1
+j loop
+end:
+
+addi a0, zero, 1
+addi sp, sp, -84
+lw a1, 0(sp)
+ecall
+lw a1, 4(sp)
+ecall
+lw a1, 8(sp)
+ecall
+lw a1, 12(sp)
+ecall
+lw a1, 16(sp)
+ecall
+lw a1, 20(sp)
+ecall
+
+add a0, zero, zero
