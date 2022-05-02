@@ -1,7 +1,7 @@
 .data
-str1: .string "The result is:\n"
-str2: .string " "
-str3: .string "\n"
+str1: .asciiz "The result is:\n"
+str2: .asciiz " "
+str3: .asciiz "\n"
 
 #Input matrix here
 .LC0:
